@@ -1,0 +1,60 @@
+Sub totalVol()
+    Dim ticker As String
+    Dim currentVol As Double
+    Dim openPrice As Double
+    Dim closePrice As Double
+    Dim stockPrice As Double
+    Dim diffPrice As Double
+    Dim totalVol As Double
+    Dim percentChanged As Double
+    Dim numberSheets As Integer
+    Dim summaryRow As Integer
+    Dim j As String
+    Dim theSheet As Worksheet
+    
+    numberSheets = ActiveWorkbook.Worksheets.Count
+    For i = 1 To numberSheets
+        Set theSheet = ActiveWorkbook.Worksheets(i)
+    
+    theSheet.Cells(1, 9) = "Ticker"
+    theSheet.Cells(1, 10) = "Yearly Changed"
+    theSheet.Cells(1, 11) = "Percent Changed"
+    theSheet.Cells(1, 12) = "Total Volume"
+    
+    summaryRow = 2
+    j = 2
+    ticker = theSheet.Cells(j, 1).Value
+    Do While ticker <> ""
+        stockPrice = theSheet.Cells(j, 6).Value
+        closePrice = theSheet.Cells(j + 1, 6).End(xlDown).Value
+        diffPrice = closePrice - stockPrice
+        If diffPrice > 0 Then
+        theSheet.Cells(summaryRow, 10).Interior.ColorIndex = 4
+        ElseIf diffPrice < 0 Then
+        theSheet.Cells(summaryRow, 10).Interior.ColorIndex = 3
+        Else
+        theSheet.Cells(summaryRow, 10).Interior.ColorIndex = 6
+        End If
+        
+        percentChanged = (closePrice - stockPrice) / stockPrice
+        theSheet.Cells(summaryRow, 11).NumberFormat = "0.00%"
+        currentVol = theSheet.Cells(j, 7).Value
+        totalVol = totalVol + currentVol
+    
+        If ticker <> theSheet.Cells(j + 1, 1).Value Then
+            theSheet.Cells(summaryRow, 9).Value = ticker
+            theSheet.Cells(summaryRow, 10).Value = diffPrice
+            theSheet.Cells(summaryRow, 11).Value = percentChanged
+            theSheet.Cells(summaryRow, 12).Value = totalVol
+            summaryRow = summaryRow + 1
+            totalVol = 0
+        diffPrice = 0
+        End If
+        j = j + 1
+        ticker = theSheet.Cells(j, 1).Value
+    Loop
+    Next i
+    
+End Sub
+
+
